@@ -1,5 +1,5 @@
 {
-  "name": "@lucianofedericopereira/meat",
+  "name": "@lucianofpereira/meat",
   "version": "1.0.0-a1",
   "description": "MEAT — Mitt Enhanced Application Toolkit. A lightweight reactive state manager with plugin support and Vue integration.",
   "type": "module",
