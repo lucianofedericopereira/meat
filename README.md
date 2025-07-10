@@ -97,3 +97,7 @@ MIT © Luciano Federico Pereira
 ---
 
 MEAT is hot, readable, and ready for your plate.
+
+## 💛 Support MEAT
+
+MEAT is maintained by [Luciano Federico Pereira](https://github.com/lucianofedericopereira). If you find it useful, consider sponsoring via [Ko-fi](https://ko-fi.com/lucianofedericopereira) or [Liberapay](https://liberapay.com/lucianofedericopereira). Your support fuels open-source development and keeps the project lean, clean, and community-powered. 🐮🧪

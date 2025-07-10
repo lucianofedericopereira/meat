@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lucianofedericopereira.github.io/meat/sitemap.xml
