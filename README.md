@@ -28,9 +28,9 @@ Minimal reactivity system with plugin support, Vue composables, and zero depende
 
 ## 📦 Install
 
-npm install meat  
+npm install @lucianofpereira/meat  
 # or  
-yarn add meat
+yarn add @lucianofpereira/meat
 
 Import and use:
 
