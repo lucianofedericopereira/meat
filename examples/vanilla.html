@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MEAT Vanilla Example</title>
+  <script src="../src/meat.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    button { margin-right: 1rem; }
+    #display { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>MEAT Vanilla Example</h1>
+  <button onclick="meat.set('count', meat.get('count') + 1)">Increment</button>
+  <button onclick="meat.reset()">Reset</button>
+
+  <div id="display">Count: 0</div>
+
+  <script>
+    meat.set('count', 0);
+
+    meat.watch('count', val => {
+      document.getElementById('display').textContent = `Count: ${val}`;
+    });
+  </script>
+
+</body>
+</html>
