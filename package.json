@@ -1,7 +1,8 @@
 {
   "name": "meat",
-  "version": "1.A1",
+  "version": "1.0.0-a1",
   "description": "MEAT — Mitt Enhanced Application Toolkit. A lightweight reactive state manager with plugin support and Vue integration.",
+  "type": "module",
   "author": "Luciano Federico Pereira <lucianopereira@posteo.es>",
   "license": "MIT",
   "repository": {
@@ -9,6 +10,9 @@
     "url": "https://github.com/lucianofedericopereira/meat.git"
   },
   "homepage": "https://github.com/lucianofedericopereira/meat",
+  "bugs": {
+    "url": "https://github.com/lucianofedericopereira/meat/issues"
+  },
   "keywords": [
     "reactivity",
     "state",
@@ -24,6 +28,9 @@
   ],
   "main": "src/meat.js",
   "module": "src/meat.js",
+  "exports": {
+    ".": "./src/meat.js"
+  },
   "files": [
     "src/",
     "test/",
@@ -34,6 +41,10 @@
     "test": "node test/meat.test.js && node test/plugins.test.js"
   },
   "devDependencies": {
-    "@vue/reactivity": "^3.4.0" 
-  }
+    "@vue/reactivity": "^3.4.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "sideEffects": false
 }
