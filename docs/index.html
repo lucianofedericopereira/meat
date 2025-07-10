@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEAT — Mitt Enhanced Application Toolkit</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      background-color: #f2eae3;
+      color: #2c2c2c;
+    }
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+    header img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-top: 1rem;
+    }
+    .tagline {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+    .section {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .section ul {
+      padding-left: 1.2rem;
+      line-height: 1.6;
+    }
+    .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #783d19;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      padding: 2rem 1rem;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="./assets/banner.jpg" alt="MEAT Mascot Banner" />
+    <h1>MEAT Toolkit</h1>
+    <p class="tagline">🥩 Mitt Enhanced Application Toolkit — Minimal state, maximum flavor.</p>
+    <a class="btn" href="https://github.com/lucianofedericopereira/meat" target="_blank">View on GitHub</a>
+  </header>
+
+  <div class="section">
+    <h2>Features</h2>
+    <ul>
+      <li>Reactive state with <code>set()</code> / <code>get()</code></li>
+      <li>Scoped listeners and lightweight plugin system</li>
+      <li>Vue 3 composables support via <code>useMeat()</code></li>
+      <li>LocalStorage persistence with <code>persist()</code> and <code>load()</code></li>
+      <li>DOM binding utility via <code>linkToDOM()</code></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Getting Started</h2>
+    <p>Install MEAT:</p>
+    <pre><code>npm install meat</code></pre>
+    <p>Usage:</p>
+    <pre><code>import meat from 'meat';
+meat.set('theme', 'dark');</code></pre>
+  </div>
+
+  <footer>
+    © 2025 Luciano F. Pereira — Proudly powered by MEAT 🥩
+  </footer>
+</body>
+</html>

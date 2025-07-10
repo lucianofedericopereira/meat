@@ -1,6 +1,10 @@
 # 🥩 MEAT
 
 **Mitt Enhanced Application Toolkit**  
+
+![MEAT Mascot](./assets/a1.png)
+
+
 Minimal reactivity system with plugin support, Vue composables, and zero dependencies.
 
 ![Version](https://img.shields.io/badge/version-1.A1-saucy)
