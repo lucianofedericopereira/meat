@@ -7,7 +7,7 @@
 Minimal reactive state system with plugin support, Vue composables, and zero dependencies.
 
 ![Version](https://img.shields.io/badge/version-1.A1-saucy)
-![License](https://img.shields.io/github/license/lucianofedericopereira/meat)
+![Open Source](https://img.shields.io/badge/license-MIT-blue)
 ![Code Size](https://img.shields.io/github/languages/code-size/lucianofedericopereira/meat)
 ![Contributions](https://img.shields.io/badge/contributions-open-brightgreen)
 ![Author](https://img.shields.io/badge/made%20by-Luciano%20Federico%20Pereira-blue)
