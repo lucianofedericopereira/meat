@@ -1,0 +1,10 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "../../..",
+    "paths": {
+      "@meat": ["src/meat.ts"]
+    },
+    "allowImportingTsExtensions": true
+  }
+}
