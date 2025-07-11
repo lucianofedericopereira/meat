@@ -1,0 +1,8 @@
+---
+import { useMeat } from '../../src/plugins/astro/useMeat.ts';
+const counter = useMeat('count');
+counter.set(counter.get() + 1);
+---
+
+<button on:click={() => counter.set(counter.get() + 1)}>Increment</button>
+<p>MEAT count: {counter.get()}</p>

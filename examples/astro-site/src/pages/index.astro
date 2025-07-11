@@ -1,0 +1,17 @@
+---
+import Counter from '../components/Counter.astro';
+import meat from '../../../src/meat.ts';
+
+meat.set('count', 0); // Initialize count if needed
+---
+
+<html lang="en">
+  <head>
+    <title>MEAT + Astro Demo</title>
+  </head>
+  <body>
+    <h1>Welcome to MEAT + Astro</h1>
+    <Counter />
+    <p>MEAT snapshot: {JSON.stringify(meat.getState())}</p>
+  </body>
+</html>

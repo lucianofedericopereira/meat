@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MEAT + Alpine.js Demo</title>
+  <script src="https://unpkg.com/alpinejs" defer></script>
+  <script type="module">
+    import meat from '../../src/meat.js';
+    import { meatAlpinePlugin } from '../../src/plugins/alpine/meatAlpinePlugin.js';
+
+    window.meat = meat;
+
+    // Register plugin with Alpine
+    import Alpine from 'alpinejs';
+    Alpine.plugin(meatAlpinePlugin);
+    Alpine.start();
+  </script>
+</head>
+<body>
+  <div x-data="{ count: 0 }" x-init="$watch('count', val => $meat.set('count', val))">
+    <button @click="count++">Increment</button>
+    <p>Alpine count: <span x-text="count"></span></p>
+    <p>MEAT count: <span id="meat-count"></span></p>
+  </div>
+
+  <script type="module">
+    // Live sync MEAT state to DOM
+    meat.subscribe('count', val => {
+      document.getElementById('meat-count').textContent = val;
+    });
+  </script>
+</body>
+</html>
