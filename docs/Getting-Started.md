@@ -9,7 +9,7 @@ MEAT is a lightweight JavaScript toolkit for reactive state — zero dependencie
 Via npm:
 
 ```bash
-npm install meat
+npm install @lucianofpereira/meat
 ```
 
 Or via CDN:
