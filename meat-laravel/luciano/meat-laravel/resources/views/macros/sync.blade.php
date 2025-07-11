@@ -1,0 +1,1 @@
+<input type="hidden" name="{{ $key }}" data-meat-bind="{{ $key }}">

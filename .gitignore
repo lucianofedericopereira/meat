@@ -1,0 +1,9 @@
+# Laravel-specific ignores for meat-laravel
+/meat-laravel/vendor/
+/meat-laravel/node_modules/
+/meat-laravel/storage/
+/meat-laravel/bootstrap/cache/
+/meat-laravel/.env
+/meat-laravel/.phpunit.result.cache
+/meat-laravel/public/storage
+/meat-laravel/public/build

@@ -28,6 +28,8 @@ This site contains internal design notes, usage guides, integration examples, an
 | [Solid](./solid.md) | Signal-based Solid plugin |
 | [Svelte](./svelte.md) | Store wrapper for Svelte |
 | [Vue](./vue.md) | Vue injection and composables |
+| [Laravel](./laravel.md) | Blade macros, middleware, hydration directives |
+
 
 ### 🧪 Examples & Tests
 

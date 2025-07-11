@@ -87,6 +87,21 @@ const theme = useMeat('theme'); // Vue reactive ref
 | [Solid](./docs/solid.md) | Solid |
 | [Svelte](./docs/svelte.md) | Svelte |
 | [Vue](./docs/vue.md) | Vue |
+| [Laravel](./docs/laravel.md) | Blade macros, middleware, event syncing |
+
+---
+
+## 🐘 Laravel Integration
+
+MEAT includes first-class support for Laravel with Blade directives, hydration macros, hashed syncing, and event-binding middleware.
+
+```blade
+@meatHydrate($state)
+@meatSync('message')
+@meatSyncEvent('message', \App\Events\PayloadSynced::class)
+
+
+
 
 ### 🧪 Examples & Tests
 
