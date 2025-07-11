@@ -6,6 +6,8 @@
 
 Minimal reactive state system with plugin support, Vue composables, and zero dependencies.
 
+One API, ten frameworks, zero stress. MEAT plugs into Alpine, Angular, Astro, Nuxt, Next.js, React, Qwik, Solid, Svelte, and Vue — saving your bacon across the board.
+
 ![Version](https://img.shields.io/badge/version-1.A1-saucy)
 ![Open Source](https://img.shields.io/badge/license-MIT-blue)
 ![Code Size](https://img.shields.io/github/languages/code-size/lucianofedericopereira/meat)
