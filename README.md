@@ -92,7 +92,7 @@ Activate with:
 ```js
 import { MeatChronicle } from './plugins/chronicle.js';
 meat.use(MeatChronicle);
-
+```
 
 ---
 
