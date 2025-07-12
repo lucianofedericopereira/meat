@@ -1,203 +1,180 @@
-// MEAT — Mitt Enhanced Application Toolkit
-// Reactive state manager with scoped event bus and plugin system
-
-(function () {
-  const config = {
-    mutable: false, // If true, direct mutations are allowed
-    debug: false     // Enables internal console logging
+;(function () {
+  const config = { mutable: false, debug: false };
+  const pluginAccess = {
+    mode: "open",
+    whitelist: null
   };
-
-  const log = (...args) => config.debug && console.log("[MEAT]", ...args);
-
-  // Internal event bus to manage scoped listeners
+  const debugLog = (...args) => config.debug && console.log("[MEAT]", ...args);
+  const warn = (code, detail) => console.warn(`[MEAT:${code}]`, detail || "");
   const eventBus = (() => {
-    const all = new Map();
-
+    const listenersMap = new Map();
     return {
-      on(type, handler) {
-        const handlers = all.get(type);
-        handlers ? handlers.push(handler) : all.set(type, [handler]);
+      on(type, cb) {
+        if (typeof cb !== "function") return;
+        if (!listenersMap.has(type)) listenersMap.set(type, []);
+        listenersMap.get(type).push(cb);
       },
-      off(type, handler) {
-        const handlers = all.get(type);
-        if (handlers) {
-          handler
-            ? handlers.splice(handlers.indexOf(handler) >>> 0, 1)
-            : all.set(type, []);
+      off(type, cb) {
+        const list = listenersMap.get(type);
+        if (!list) return;
+        if (cb) {
+          const i = list.indexOf(cb);
+          if (i > -1) list.splice(i, 1);
+        } else {
+          listenersMap.set(type, []);
         }
       },
       emit(type, payload) {
-        if (all.has(type)) all.get(type).slice().forEach(fn => fn(payload));
-        if (all.has("*")) all.get("*").slice().forEach(fn => fn(type, payload));
+        const list = listenersMap.get(type);
+        if (list) {
+          for (let i = 0; i < list.length; i++) {
+            try { list[i](payload); } catch (e) { warn("HANDLER_ERROR", e); }
+          }
+        }
+        const wild = listenersMap.get("*");
+        if (wild) {
+          for (let i = 0; i < wild.length; i++) {
+            try { wild[i](type, payload); } catch (e) { warn("WILDCARD_ERROR", e); }
+          }
+        }
       },
-      has(type) {
-        return all.has(type);
-      },
-      listeners() {
-        return [...all.keys()];
-      }
+      has: t => listenersMap.has(t),
+      listeners: () => [...listenersMap.keys()]
     };
   })();
-
-  // Core state container
   let state = Object.create(null);
-
-  // State accessors
-  const getState = () => ({ ...state });
-  const get = key => state[key];
-  const has = key => key in state;
-  const hasChanged = (key, value) => state[key] !== value;
+  let prevStateRef = null;
+  let cachedString = "";
+  const getState = () => config.mutable ? state : Object.assign({}, state);
+  const get = k => state[k];
+  const has = k => k in state;
+  const hasChanged = (k, v) => state[k] !== v;
   const keys = () => Object.keys(state);
   const values = () => Object.values(state);
-  const select = list => Object.fromEntries(list.map(k => [k, state[k]]));
-  const serialize = () => JSON.stringify(state);
-
-  // Emit updates if listeners exist
-  const emitIfListening = (key, value) => {
-    const base = "meat:update";
-    eventBus.has(`${base}:${key}`) && eventBus.emit(`${base}:${key}`, value);
-    eventBus.has(base) && eventBus.emit(base, getState());
+  const selectCache = new WeakMap();
+  const select = list => {
+    if (!Array.isArray(list)) return {};
+    if (selectCache.has(list)) return selectCache.get(list);
+    const result = Object.fromEntries(list.map(k => [k, state[k]]));
+    selectCache.set(list, result);
+    return result;
   };
-
-  // Update individual state key
+  const serialize = () => {
+    if (prevStateRef === state) return cachedString;
+    cachedString = JSON.stringify(state);
+    prevStateRef = state;
+    return cachedString;
+  };
+  const emitStateChange = (key, value) => {
+    const snap = getState();
+    eventBus.emit(`meat:update:${key}`, value);
+    eventBus.emit("meat:update", snap);
+  };
   const set = (key, value) => {
-    if (!hasChanged(key, value)) return;
-
-    if (config.mutable) {
-      state[key] = value;
-    } else {
-      state = { ...state, [key]: value };
-    }
-
-    emitIfListening(key, value);
-    log("set", key, value);
+    if (state[key] === value) return;
+    state = config.mutable
+      ? (state[key] = value, state)
+      : { ...state, [key]: value };
+    emitStateChange(key, value);
+    debugLog("set", key, value);
   };
-
-  // Update multiple state keys at once
-  const setState = (obj = {}) => {
-    let changed = false;
-    let newState = config.mutable ? state : { ...state };
-
-    for (const key in obj) {
-      if (hasChanged(key, obj[key])) {
-        newState[key] = obj[key];
-        eventBus.has(`meat:update:${key}`) && eventBus.emit(`meat:update:${key}`, obj[key]);
-        changed = true;
-        log("update", key, obj[key]);
-      }
-    }
-
-    if (changed) {
-      state = config.mutable ? newState : { ...newState };
-      eventBus.has("meat:update") && eventBus.emit("meat:update", getState());
-    }
+  const setState = (updates = {}) => {
+    const changed = Object.keys(updates).filter(k => state[k] !== updates[k]);
+    if (!changed.length) return;
+    const next = config.mutable ? state : Object.assign({}, state);
+    changed.forEach(k => {
+      next[k] = updates[k];
+      eventBus.emit(`meat:update:${k}`, updates[k]);
+      debugLog("update", k, updates[k]);
+    });
+    state = config.mutable ? next : Object.assign({}, next);
+    eventBus.emit("meat:update", getState());
   };
-
-  // Merge behavior alias
   const merge = obj => setState(obj);
-
-  // Clear all state keys
   const clear = () => {
-    const clearedKeys = keys();
-    config.mutable
-      ? clearedKeys.forEach(k => delete state[k])
-      : (state = {});
-
-    clearedKeys.forEach(k =>
-      eventBus.has(`meat:update:${k}`) &&
-      eventBus.emit(`meat:update:${k}`, undefined)
-    );
-
-    eventBus.has("meat:update") && eventBus.emit("meat:update", getState());
-    log("clear store");
-  };
-
-  const reset = () => clear(); // Alias for clear()
-
-  // Save state to localStorage
-  const persist = (key = "meatState") => {
-    try {
-      localStorage.setItem(key, serialize());
-      log("persist", key);
-    } catch (e) {
-      console.warn("MEAT persist failed:", e);
+    const cleared = keys();
+    if (config.mutable) {
+      cleared.forEach(k => delete state[k]);
+    } else {
+      state = {};
     }
+    cleared.forEach(k => eventBus.emit(`meat:update:${k}`, undefined));
+    eventBus.emit("meat:update", getState());
+    debugLog("clear store");
   };
-
-  // Load state from localStorage
-  const load = (key = "meatState") => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(key));
-      if (saved && typeof saved === "object") setState(saved);
-      log("load", key, saved);
-    } catch (e) {
-      console.warn("MEAT load failed:", e);
-    }
-  };
-
-  // Subscribe to global state changes
+  const reset = () => clear();
   const subscribe = cb => {
-    if (typeof cb === "function") {
-      eventBus.on("meat:update", cb);
-      cb(getState());
-      return () => eventBus.off("meat:update", cb);
-    }
+    if (typeof cb !== "function") return;
+    eventBus.on("meat:update", cb);
+    cb(getState());
+    return () => eventBus.off("meat:update", cb);
   };
-
-  // Watch a specific key
   const watch = (key, cb) => {
-    if (typeof cb === "function") {
-      const event = `meat:update:${key}`;
-      eventBus.on(event, cb);
-      cb(get(key));
-      return () => eventBus.off(event, cb);
-    }
+    if (typeof cb !== "function") return;
+    const name = `meat:update:${key}`;
+    eventBus.on(name, cb);
+    cb(get(key));
+    return () => eventBus.off(name, cb);
   };
-
-  // One-time listener for key
   const once = (key, cb) => {
-    const wrapper = val => {
-      cb(val);
-      eventBus.off(`meat:update:${key}`, wrapper);
+    if (typeof cb !== "function") return;
+    const name = `meat:update:${key}`;
+    const handler = v => {
+      try { cb(v); } catch (e) { warn("ONCE_ERROR", e); }
+      eventBus.off(name, handler);
     };
-    eventBus.on(`meat:update:${key}`, wrapper);
+    eventBus.on(name, handler);
   };
-
-  // Wildcard listener for any event
   const onAny = cb => {
-    if (typeof cb === "function") {
-      eventBus.on("*", cb);
-      return () => eventBus.off("*", cb);
-    }
+    if (typeof cb !== "function") return;
+    eventBus.on("*", cb);
+    return () => eventBus.off("*", cb);
   };
-
-  // Remove all listeners
   const unbindAll = () => {
-    eventBus.listeners().forEach(key => eventBus.off(key));
-    log("unbind all");
+    eventBus.listeners().forEach(type => eventBus.off(type));
+    debugLog("unbind all");
   };
-
-  // Bind state to DOM via attribute
-  const linkToDOM = (selector, attr = "data-meat") => {
-    const el = typeof selector === "string" ? document.querySelector(selector) : selector;
-    if (!el) {
-      console.warn(`linkToDOM: No DOM element matches "${selector}"`);
-      return;
+  const createPluginAPI = () => {
+    if (pluginAccess.mode === "open") return meat;
+    if (pluginAccess.mode === "restricted" && Array.isArray(pluginAccess.whitelist)) {
+      return Object.fromEntries(pluginAccess.whitelist.map(k => [k, meat[k]]));
     }
-    subscribe(newState => el.setAttribute(attr, serialize()));
+    if (pluginAccess.mode === "locked") {
+      return {
+        getState: meat.getState,
+        serialize: meat.serialize,
+        config: Object.assign({}, meat.config)
+      };
+    }
+    return meat;
   };
-
-  // Plugin injector
+  const definedMethods = new Set();
+  const loadedPlugins = new Set();
   const use = (plugin, options = {}) => {
-    if (typeof plugin === "function") {
-      plugin(meat, options);
-      log("plugin loaded");
+    if (typeof plugin !== "function" || loadedPlugins.has(plugin)) return;
+    loadedPlugins.add(plugin);
+    try {
+      const before = Object.keys(meat);
+      plugin(createPluginAPI(), options);
+      const after = Object.keys(meat);
+      after.forEach(k => {
+        if (before.includes(k) && !definedMethods.has(k)) {
+          warn("PLUGIN_CLASH", `Method "${k}" overwritten by plugin`);
+          definedMethods.add(k);
+        }
+      });
+    } catch (e) {
+      warn("PLUGIN_ERROR", e);
     }
   };
-
-  // Exported MEAT API
+  const unuse = plugin => {
+    if (typeof plugin.cleanup === "function") {
+      try { plugin.cleanup(); } catch (e) { warn("PLUGIN_CLEANUP_FAIL", e); }
+    }
+  };
   const meat = {
     config,
+    pluginAccess,
     getState,
     setState,
     get,
@@ -211,21 +188,117 @@
     merge,
     clear,
     reset,
-    persist,
-    load,
     subscribe,
     watch,
     once,
     onAny,
     unbindAll,
-    linkToDOM,
     listeners: eventBus.listeners,
     isWatched: eventBus.has,
     on: eventBus.on,
     off: eventBus.off,
     emit: eventBus.emit,
-    use
+    use,
+    unuse
   };
-
-  window.meat = meat;
+  meat.version = "1.0.0";
+  meat.devtools = () => {
+    console.table(getState());
+  };
+  meat.isEmpty = () => {
+    return keys().length === 0;
+  };
+  meat.find = (fn) => {
+    return keys().filter(k => fn(k, state[k]));
+  };
+  meat.inspectKey = (key) => {
+    return {
+      value: get(key),
+      watched: eventBus.has(`meat:update:${key}`)
+    };
+  };
+  const persistPlugin = meat => {
+    meat.persist = (key = "meatState") => {
+      try {
+        localStorage.setItem(key, meat.serialize());
+        meat.config.debug && console.log("[MEAT] persist", key);
+      } catch (e) {
+        warn("PERSIST_FAIL", e);
+      }
+    };
+    meat.load = (key = "meatState") => {
+      try {
+        const raw = localStorage.getItem(key);
+        const saved = JSON.parse(raw);
+        if (saved && typeof saved === "object") {
+          meat.setState(saved);
+          meat.config.debug && console.log("[MEAT] load", key, saved);
+        }
+      } catch (e) {
+        warn("LOAD_FAIL", e);
+      }
+    };
+    meat.dump = () => {
+      return getState();
+    };
+    meat.bindToGlobal = (name = "meat") => {
+      window[name] = meat;
+    };
+    let lastMutationTime = null;
+    let modifiedKeys = [];
+    const trackMutation = (key, value) => {
+      lastMutationTime = Date.now();
+      if (!modifiedKeys.includes(key)) {
+        modifiedKeys.push(key);
+      }
+    };
+    const originalSet = set;
+    set = (key, value) => {
+      originalSet(key, value);
+      trackMutation(key, value);
+    };
+    meat.set = set;
+    const originalSetState = setState;
+    setState = (updates = {}) => {
+      originalSetState(updates);
+      Object.keys(updates).forEach(k => trackMutation(k, updates[k]));
+    };
+    meat.setState = setState;
+    meat.lastModified = () => lastMutationTime;
+    meat.changedKeys = () => [...modifiedKeys];
+    meat.freeze = () => (config.mutable = false);
+    meat.thaw = () => (config.mutable = true);
+    meat.configurable = () => {
+      console.log("MEAT Config:", config);
+    };
+  };
+  const linkPlugin = (meat, options = {}) => {
+    meat.linkToDOM = (selector, attr = "data-meat") => {
+      const el = typeof selector === "string"
+        ? document.querySelector(selector)
+        : selector;
+      if (!el) return warn("DOM_BIND_FAIL", `No DOM matches "${selector}"`);
+      if (!meat.serialize || !meat.subscribe) {
+        return warn("ACCESS_DENIED", "Missing serialize/subscribe");
+      }
+      let lastSnapshot;
+      const stop = meat.subscribe(() => {
+        const snapshot = meat.serialize();
+        if (snapshot !== lastSnapshot) {
+          el.setAttribute(attr, snapshot);
+          lastSnapshot = snapshot;
+        }
+      });
+      meat.unbindDOM = () => {
+        stop();
+        el.removeAttribute(attr);
+      };
+    };
+    if (options.selector) {
+      meat.linkToDOM(options.selector, options.attr);
+    }
+  };
+  meat.use(persistPlugin);
+  meat.use(linkPlugin);
+  meat.bindToGlobal();
 })();

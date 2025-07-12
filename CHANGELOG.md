@@ -19,3 +19,41 @@ All notable changes to MEAT will be documented in this file.
 - Tests for state, plugins, and Vue hooks
 
 Released: July 10, 2025
+
+
+## [1.B0] — Ribwich Edition
+
+> “We only sell the Ribwich for a limited time... and this release’s spicy.”
+
+### 🍖 Core
+
+- `bindToGlobal()`, `freeze()`, `thaw()`, `configurable()`
+- Utility methods: `dump()`, `find()`, `inspectKey()`, `isEmpty()`, `lastModified()`, `changedKeys()`
+- Unified `logMessage()` injector for scoped, timestamped console output
+
+### 🔌 Plugin: MeatChronicle
+
+Single plugin, many powers:
+
+- ⏪ Timeline per key with undo + rollback
+- 🔁 Rollback all keys with `meat.rollbackAll()`
+- 🧯 Protected execution via `meat.safe(fn)`
+- 🧠 Tagged mutation history with source + timestamp
+- 🔍 Introspectors: `getHistory()`, `historySnapshot()`, `changedKeys()`
+- 📊 Console logger: `logHistory(key)`
+- 🔐 Fully listener-based — no monkey-patching
+- ⚙️ Compatible with all framework adapters
+
+> No external checkpoint or persistence plugins required — everything flows through Chronicle.
+
+### 🧩 Framework Support
+
+- ✅ Vue 3 via `meatVuePlugin`, `useMeat`
+- ✅ Laravel via Blade macros, middleware, and Livewire
+- ✅ Alpine, Astro, Nuxt, Next, React, Qwik, Solid, Svelte
+- 🧪 Angular stub adapter ready
+
+---
+
+Released: July 13, 2025  
+Codename: **Ribwich Edition**
