@@ -9,9 +9,12 @@ Welcome to the internal documentation for **MEAT — Mitt Enhanced Application T
 - [Architecture](#architecture)
 - [Core State API](#core-state-api)
 - [Event System](#event-system)
-- [Plugins](#plugins)
-- [Vue Integration](#vue-integration)
-- [Testing](#testing)
+- [Plugin System](#plugin-system)
+- [Logging & Debug](#logging--debug)
+- [Persistence & Utilities](#persistence--utilities)
+- [DOM Binding](#dom-binding)
+- [Devtools](#devtools)
+- [Core Config](#core-config)
 - [Examples](#examples)
 - [License](#license)
 
@@ -28,96 +31,110 @@ MEAT is a reactive state manager built on a scoped event bus. It allows precise 
 
 ## Core State API
 
-The following methods operate on MEAT's internal state:
+- `getState()` – return a shallow copy of the current state object **(new)**
+- `get(key)` – retrieve the value for a specific key
+- `set(key, value)` – assign a value to a key and emit update events
+- `setState(updates)` – batch-apply multiple key→value updates and emit events
+- `merge(obj)` – alias for `setState()`
+- `clear()` – remove all keys from state and emit clear events
+- `reset()` – alias for `clear()`
+- `serialize()` – return a JSON string of state (cached if unchanged)
+- `dump()` – return the raw state object
+- `isEmpty()` – return true if no keys are present
+- `find(fn)` – return an array of keys for which `fn(key, value)` is true
+- `inspectKey(key)` – return an object `{ value, watched }` for a given key
+- `has(key)` – return true if the key exists in state
+- `hasChanged(key, value)` – return true if the current value differs from provided
+- `keys()` – return an array of all state keys
+- `values()` – return an array of all state values
+- `select(list)` – return an object of key→value pairs for the specified keys
 
-| Method           | Purpose                    |
-|------------------|----------------------------|
-| `get(key)`       | Retrieve a value           |
-| `set(key, val)`  | Update key with value      |
-| `setState(obj)`  | Batch update multiple keys |
-| `clear()`        | Wipe all stored keys       |
-| `merge(obj)`     | Alias for `setState()`     |
+### New Features
 
-Additional utilities: `keys()`, `values()`, `select([list])`, `serialize()`, `has()`, `hasChanged()`.
+- `undo(key)` – restore the previous value for a given key **(new)**
+- `rollback(key)` – alias for `undo(key)` **(new)**
+- `rollbackAll()` – revert all keys to their previous values **(new)**
+- `safe(fn)` – execute a function with automatic rollback on error **(new)**
+- `historySnapshot()` – return a deep snapshot of all keys' mutation history **(new)**
+- `logMessage(message, context)` – unified timestamped console logging **(new)**
+- `lastModified()` – return the timestamp of the last state mutation **(new)**
+- `changedKeys()` – return an array of keys modified since last reset **(new)**
+- `freeze()` – disable direct state mutation **(new)**
+- `thaw()` – enable direct state mutation **(new)**
+- `configurable()` – log current configuration to console **(new)**
 
 ---
 
 ## Event System
 
-MEAT exposes an internal event bus for scoped listeners:
-
-| Method              | Description                   |
-|---------------------|-------------------------------|
-| `watch(key, cb)`    | Listen to changes on a key    |
-| `subscribe(cb)`     | Listen to any state change    |
-| `once(key, cb)`     | Fire only on next change      |
-| `onAny(cb)`         | Catch all events              |
-| `unbindAll()`       | Remove all active listeners   |
-
-Events follow this format: `meat:update:<key>` or `meat:update` for global changes.
+- `subscribe(cb)` – listen to every state change; invokes `cb(initialState)` immediately
+- `watch(key, cb)` – listen to changes on a specific key; invokes `cb(currentValue)` immediately
+- `once(key, cb)` – listen only to the next change on a specific key
+- `onAny(cb)` – wildcard listener for every internal event
+- `unbindAll()` – remove all listeners from the event bus
+- `on(type, cb)` – low-level event subscription for any custom event type
+- `off(type, cb)` – remove a specific listener or all listeners for a type
+- `emit(type, payload)` – emit a custom event with optional payload
 
 ---
 
-## Plugins
+## Plugin System
 
-Plugins can augment MEAT with new capabilities:
-
-```js
-meat.use(pluginFn, options);
-```
-
-Example: `logState.js` adds `meat.logState()` to visualize current state using `console.table()`.
-
-All plugin functions receive the `meat` API and optional config.
+- `use(pluginFn, options)` – register a plugin function with optional config
+- `unuse(pluginFn)` – invoke `cleanup()` on a plugin if provided
 
 ---
 
-## Vue Integration
+## Logging & Debug
 
-MEAT integrates with Vue 3 via plugin and composable:
-
-- `meatVuePlugin.js`: injects `$meat` into global properties
-- `useMeat.js`: returns a reactive `ref` bound to a MEAT key
-
-```js
-import { useMeat } from '../src/plugins/vue/useMeat.js';
-const theme = useMeat('theme');
-```
-
-Vue state syncs with MEAT automatically and cleans up listeners on unmount.
+- `debugLog(...args)` – internal debug logger (active if `config.debug`)
+- `warn(code, detail)` – internal warning logger for errors and clashes
+- `logMessage(message, context)` – unified timestamped console log **(new)**
 
 ---
 
-## Testing
+## Persistence & Utilities
 
-Basic test suite lives in `/test/`:
+- `persist(key)` – save serialized state to `localStorage` under the given key
+- `load(key)` – load and apply saved state from `localStorage`
+- `dump()` – return the raw state object
+- `bindToGlobal(name)` – attach the meat instance to `window[name]`
+- `lastModified()` – return timestamp of the last state mutation **(new)**
+- `changedKeys()` – return array of keys modified since load or reset **(new)**
+- `freeze()` – set `config.mutable = false` to prevent direct mutation **(new)**
+- `thaw()` – set `config.mutable = true` to allow direct mutation **(new)**
+- `configurable()` – log the current plugin and state config object to console **(new)**
 
-- `meat.test.js`: verifies core logic
-- `plugins.test.js`: checks plugin registration
-- `vue.test.js`: optional reactive testing
+---
 
-Run using Node:
+## DOM Binding
 
-```bash
-npm test
-```
+- `linkToDOM(selector, attr)` – bind serialized state to a DOM element’s attribute
+- `unbindDOM()` – remove the DOM binding and cleanup listeners
 
-Or use Vitest/Jest for expanded testing coverage.
+---
+
+## Devtools
+
+- `devtools()` – print the current state object as a `console.table`
+
+---
+
+## Core Config
+
+- `config` – `{ mutable: boolean, debug: boolean }`
+- `pluginAccess` – `{ mode: "open" | "restricted" | "locked", whitelist: string[] | null }`
+- `version` – version string (e.g. `"1.0.0-ribwich"`)
 
 ---
 
 ## Examples
 
-- `/example/vue-example.vue`: Vue component using MEAT
-- `/example/vanilla.html`: Plain HTML + MEAT integration
-
-These demonstrate usage of `set()`, `watch()`, and live UI state syncing.
+- `/example/vue-example.vue` – Vue component using MEAT
+- `/example/vanilla.html` – Plain HTML + MEAT integration
 
 ---
 
 ## License
 
 MIT © Luciano Federico Pereira  
-Full license included in `/LICENSE`
-
----

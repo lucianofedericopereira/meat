@@ -18,6 +18,7 @@ This site contains internal design notes, usage guides, integration examples, an
 
 | Page | Integration |
 |------|-------------|
+| [Chronicle](./chronicle.md) | Chronicle.js MEAT plugin |
 | [Alpine](./alpine.md) | Alpine.js MEAT plugin |
 | [Angular](./angular.md) | Angular service and plugin |
 | [Astro](./astro.md) | Astro islands and MEAT |

@@ -8,11 +8,26 @@ Minimal reactive state system with plugin support, Vue composables, and zero dep
 
 One API, ten frameworks, zero stress. MEAT plugs into Alpine, Angular, Astro, Nuxt, Next.js, React, Qwik, Solid, Svelte, and Vue — saving your bacon across the board.
 
-![Version](https://img.shields.io/badge/version-1.A1-saucy)
+![Version](https://img.shields.io/badge/version-1.B0-ribwich)
 ![Open Source](https://img.shields.io/badge/license-MIT-blue)
 ![Code Size](https://img.shields.io/github/languages/code-size/lucianofedericopereira/meat)
 ![Contributions](https://img.shields.io/badge/contributions-open-brightgreen)
 ![Author](https://img.shields.io/badge/made%20by-Luciano%20Federico%20Pereira-blue)
+
+
+---
+
+🍖 Core Features (Ribwich Edition)
+
+- ✅ Reactive state engine with set(), get(), and setState()
+- 🧠 Per-key mutation history via MeatChronicle
+- ⏪ Undo / rollback / safe execution with undo(), rollbackAll(), and safe(fn)
+- 🔍 Runtime introspection (dump(), find(), changedKeys(), lastModified())
+- 🧪 Temporal snapshotting with historySnapshot()
+- 🔗 DOM binding via linkToDOM() — usable across Alpine, Svelte, Astro
+- 🧩 Plugin architecture with .use() for extensions
+- 🗂️ LocalStorage support via persist() and load()
+- ⚙️ Framework adapters for Vue, Laravel, React, Nuxt, and more
 
 ---
 
@@ -62,6 +77,23 @@ Composables:
 const theme = useMeat('theme'); // Vue reactive ref
 ```
 
+### 🧠 Included Plugins
+
+MEAT ships with **MeatChronicle**, a single all-in-one runtime plugin providing:
+
+- per-key mutation logs
+- `undo()` and `rollback()` capabilities
+- `safe(fn)` execution guards
+- temporal snapshots via `historySnapshot()`
+- `logMessage()` with scoped tracing
+
+Activate with:
+
+```js
+import { MeatChronicle } from './plugins/chronicle.js';
+meat.use(MeatChronicle);
+
+
 ---
 
 ## 📚 Docs Overview
@@ -72,6 +104,8 @@ const theme = useMeat('theme'); // Vue reactive ref
 | [Getting Started](./docs/Getting-Started.md) | Setup tutorial |
 | [Architecture](./docs/architecture.md) | Internal design flow |
 | [Plugins](./docs/plugins.md) | Writing MEAT plugins |
+| [MeatChronicle](./docs/chronicle.md) | Plugin architecture and API |
+
 
 ### 🔧 Framework Integrations
 
@@ -99,7 +133,7 @@ MEAT includes first-class support for Laravel with Blade directives, hydration m
 @meatHydrate($state)
 @meatSync('message')
 @meatSyncEvent('message', \App\Events\PayloadSynced::class)
-
+```
 
 
 
