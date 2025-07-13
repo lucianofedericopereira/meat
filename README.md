@@ -13,7 +13,17 @@ One API, ten frameworks, zero stress. MEAT plugs into Alpine, Angular, Astro, Nu
 ![Code Size](https://img.shields.io/github/languages/code-size/lucianofedericopereira/meat)
 ![Contributions](https://img.shields.io/badge/contributions-open-brightgreen)
 ![Author](https://img.shields.io/badge/made%20by-Luciano%20Federico%20Pereira-blue)
+[📘 MEAT Handbook](https://lucianofedericopereira.github.io/the-meat-handbook/)
 
+
+## 📘 Handbook
+
+For deep dives into MEAT’s architecture, patterns, and plugin system, see:
+
+**🧠 The MEAT Handbook**  
+A signal-first architecture reference by Luciano F. Pereira.  
+→ [Download PDF](https://github.com/lucianofedericopereira/the-meat-handbook/raw/main/export/v1/the-meat-handbook.pdf)  
+→ [Download EPUB](https://github.com/lucianofedericopereira/the-meat-handbook/raw/main/export/v1/the-meat-handbook.epub)  
 
 ---
 
