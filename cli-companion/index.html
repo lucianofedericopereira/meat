@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MEAT Counter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #FFEDC3;
+      text-align: center;
+      padding: 2rem;
+    }
+    img { width: 80px; margin-bottom: 1rem; }
+    h1 { margin-bottom: 1rem; font-size: 1.5rem; }
+    button { font-size: 1rem; padding: 0.5rem 1rem; margin-top: 1rem; cursor: pointer; }
+    #count { font-size: 2rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <img src="assets/img/a1.png" alt="MEAT Logo" />
+  <h1>MEAT Counter</h1>
+  <div id="count">0</div>
+  <button id="increment">Increment</button>
+
+  <script type="module" defer>
+    import meat from './assets/js/vendor/meat/meat.js'
+    import './assets/js/vendor/meat/plugins/logState.js'
+    import './assets/js/vendor/meat/plugins/chronicle.js'
+    const countEl = document.getElementById('count')
+    meat.signal("counter", 0)
+    meat.listen("counter", value => {
+      countEl.textContent = value
+    })
+    document.getElementById("increment").addEventListener("click", () => {
+      meat.emit("counter", meat.get("counter") + 1)
+    })
+    meat.logState("counter")
+    meat.chronicle("counter")
+  </script>
+</body>
+</html>

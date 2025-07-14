@@ -1,0 +1,5 @@
+config := fmt.Sprintf(`{
+  "name": "%s",
+  "plugins": [],
+  "signals": []
+}`, m.name)
