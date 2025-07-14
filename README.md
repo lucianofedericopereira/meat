@@ -27,6 +27,18 @@ A signal-first architecture reference by Luciano F. Pereira.
 
 ---
 
+**1.B1 — Bugfix Release**
+
+- Persistence plugin now only wraps the **public** methods (`meat.set` / `meat.setState`) — no more “invalid assignment to const” errors.  
+- `use()` warnings only fire on *actual* method overwrites (no more PLUGIN_CLASH spam).  
+- Restored aliases and APIs for backwards-compat:  
+  - `meat.bindToGlobal()`  
+  - `meat.signal()`  
+  - `meat.listen()`  
+  - `meat.logState()`  
+  - `meat.chronicle()`
+
+
 🍖 Core Features (Ribwich Edition)
 
 - ✅ Reactive state engine with set(), get(), and setState()

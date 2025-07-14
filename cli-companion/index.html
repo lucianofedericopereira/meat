@@ -48,19 +48,19 @@
   <h1>MEAT Counter</h1>
   <div id="count">0</div>
   <button id="increment">Increment</button>
-
-<script src="assets/js/vendor/meat/meat.js"></script>
-<script type="module">
-  import './assets/js/vendor/meat/plugins/logState.js'
-  import './assets/js/vendor/meat/plugins/chronicle.js'
-  const countEl = document.getElementById("count")
-  meat.signal("counter", 0)
-  meat.listen("counter", v => countEl.textContent = v)
-  meat.logState("counter")
-  meat.chronicle("counter")
-  document.getElementById("increment").addEventListener("click", () => {
-    meat.emit("counter", meat.get("counter") + 1)
-  })
-</script>
+  <script src="assets/js/vendor/meat/meat.js"></script>
+  <script type="module" defer>
+    import './assets/js/vendor/meat/plugins/logState.js';
+    import './assets/js/vendor/meat/plugins/chronicle.js';
+    const { signal, listen, logState, chronicle, get } = window.meat;
+    const countEl = document.getElementById("count");
+    signal("counter", 0);
+    listen("counter", v => (countEl.textContent = v));
+    logState("counter");
+    chronicle("counter");
+    document.getElementById("increment").addEventListener("click", () => {
+      signal("counter", get("counter") + 1);
+    });
+  </script>
 </body>
 </html>
