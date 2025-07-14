@@ -52,8 +52,35 @@
   <script type="module" defer>
     import './assets/js/vendor/meat/plugins/logState.js';
     import './assets/js/vendor/meat/plugins/chronicle.js';
-    const { signal, listen, logState, chronicle, get } = window.meat;
+    import { logConsolePlugin } from './assets/js/vendor/meat/plugins/logConsole.js';
+    meat.use(logConsolePlugin);
+    const {
+      signal,
+      listen,
+      logState,
+      chronicle,
+      get
+    } = window.meat;
     const countEl = document.getElementById("count");
+    const pushLog = msg => {
+      fetch("/__log", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: `[MEAT] ${msg}`
+      });
+    };
+    window.meat.logState = key => {
+      const initial = get(key);
+      console.log(`[MEAT] initial ${key}:`, initial);
+      pushLog(`initial ${key}: ${initial}`);
+
+      window.meat.watch(key, value => {
+        console.log(`[MEAT] ${key}:`, value);
+        pushLog(`${key}: ${value}`);
+      });
+    };
     signal("counter", 0);
     listen("counter", v => (countEl.textContent = v));
     logState("counter");
@@ -61,6 +88,6 @@
     document.getElementById("increment").addEventListener("click", () => {
       signal("counter", get("counter") + 1);
     });
-  </script>
+</script>
 </body>
 </html>
